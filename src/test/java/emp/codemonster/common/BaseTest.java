@@ -7,11 +7,10 @@ import com.jayway.jsonpath.ReadContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
 import static emp.codemonster.common.Config.config;
 import static emp.codemonster.common.RestClient.getLastResponse;
+import static emp.codemonster.common.Utils.removeSecondsFromTimestamp;
+import static emp.codemonster.common.Utils.timestampRootUTC;
 import static org.junit.Assert.assertEquals;
 
 public class BaseTest {
@@ -19,19 +18,40 @@ public class BaseTest {
     private static final Logger logger = LogManager.getLogger(BaseTest.class.getSimpleName());
     public static Request currentRequest = new Request();
 
+    public static final String UNAUTHORIZED_401_RESPONSE_BODY = "HTTP Basic: Access denied.\n";
+
     public BaseTest() {
         Config.LoadPropertyFiles();
 
+        //set base url:
+        RestClient.setBaseURI(config.getProperty("baseUrl"));
+    }
+
+    protected void initializeCodemonsterEmptyRequest() {
         // prepare request skeleton:
         currentRequest.clear();
         currentRequest.setVersion("");
-        String stringToEncode = config.getProperty("basicUser") + ":" + config.getProperty("basicPassword");
-        String basicToken = Base64.getEncoder().encodeToString(stringToEncode.getBytes(StandardCharsets.UTF_8));
-        currentRequest.addAuthorization("Basic " + basicToken);
+        currentRequest.addAuthorization("Basic " + Utils.generateBasicAuthTokenFromConfig());
         currentRequest.setContentType("application/json");
-        //set base uri:
-        RestClient.setBaseURI(config.getProperty("baseUrl"));
     }
+
+    public void healthCheckRoot() {
+        logger.info("Performing health check of the root '{}' API", RestClient.getBaseUrl());
+        initializeCodemonsterEmptyRequest();
+
+        currentRequest.deleteAuthorization();
+        Response response = RestClient.get(currentRequest);
+        String expectedTimestamp = removeSecondsFromTimestamp(timestampRootUTC());
+        String rootResponse = removeSecondsFromTimestamp(response.getBody());
+
+        //Assert success response status code == 200
+        assertEquals("Status code is not as expected:", 200, response.getStatusCode());
+
+        assertEquals("Root timestamp response is not as expected:", expectedTimestamp, rootResponse);
+
+        logger.info("Success: the expected timestamp [{}], matches the actual timestamp [{}] (seconds truncated)"
+                , expectedTimestamp, rootResponse);
+}
 
     /**
      * Compares a single value from a json with the supplied expectedResultAsString
@@ -52,7 +72,7 @@ public class BaseTest {
         String actualResultAsString = String.valueOf(parsedResult);
 
         assertEquals("Expected doesn't match actual: ", expectedResultAsString, actualResultAsString);
-        logger.debug("Success: the given expected value [{}], matches the actual value [{}] pointed by jsonPath '{}' ", expectedResultAsString, actualResultAsString, jsonPath);
+        logger.info("Success: the given expected value [{}], matches the actual value [{}] pointed by jsonPath '{}' ", expectedResultAsString, actualResultAsString, jsonPath);
     }
 
 }

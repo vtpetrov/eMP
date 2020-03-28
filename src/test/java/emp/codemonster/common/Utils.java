@@ -3,13 +3,12 @@ package emp.codemonster.common;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.fge.jackson.JsonLoader;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,11 +17,14 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static emp.codemonster.common.Config.config;
 
 public class Utils {
+
+    private static final Logger logger = LogManager.getLogger(Utils.class.getSimpleName());
 
     /**
      * Loads data provided as input into a Map of type String, String and returns the Map.
@@ -41,7 +43,7 @@ public class Utils {
         );
     }
 
-   /**
+    /**
      * @param key  The key you want to find inside the JSON
      * @param json The JSON you want to search in
      * @return NULL if specified key is not found inside the JSON provided. Otherwise the Value of the key provided.
@@ -307,10 +309,60 @@ public class Utils {
      */
     public static String prettyPrintJson(String json) {
         Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().serializeNulls().setLenient().create();
-//        JsonParser jp = new JsonParser();
-//        JsonElement je = jp.parse(json);
-        JsonElement je = JsonParser.parseString(json);
+        JsonElement je;
+        // If the response is not a vaid JSON despite the 'Content-Type' being set to 'applicaton/json'
+        // just return the body as string
+        try {
+            je = JsonParser.parseString(json);
+        } catch (JsonParseException e) {
+            return json;
+        }
 
         return gson.toJson(je);
+    }
+
+    public static String generateBasicAuthTokenFromConfig() {
+        String stringToEncode = config.getProperty("basicUser") + ":" + config.getProperty("basicPassword");
+        String basicToken = Base64.getEncoder().encodeToString(stringToEncode.getBytes(StandardCharsets.UTF_8));
+        return basicToken;
+    }
+
+    public static String timestampRoot() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        Date now = new Date();
+        String strDate = sdfDate.format(now);
+        return strDate;
+    }
+
+    public static String timestampRootUTC() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        Date now = new Date();
+        sdfDate.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdfDate.format(now);
+    }
+
+    public static String removeSecondsFromTimestamp(String timestamp){
+        String result;
+        result = timestamp.substring(0, 16) + timestamp.substring(19);
+
+        return result;
+    }
+
+    /**
+     * Generates string in format MM/YYYY ; e.g. "06/2019"
+     *
+     * @param month month to be used
+     * @param year  year to be used
+     * @return The string in the desired format generated from the input params
+     */
+    public static String getExpirationDate(int month, int year) {
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/YYYY");
+
+        Calendar cal = Calendar.getInstance();
+        // subtract 1 as Calendar.MONTH is zero based
+        cal.set(Calendar.MONTH, month - 1);
+        cal.set(Calendar.YEAR, year);
+
+        return sdf.format(cal.getTime());
     }
 }
