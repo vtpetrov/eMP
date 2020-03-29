@@ -121,7 +121,7 @@ public class BaseTest {
 
         String actualResultAsString = String.valueOf(parsedResult);
 
-        assertEquals("Expected doesn't match actual: ", expectedResultAsString, actualResultAsString);
+        assertEquals( name.getMethodName() + " - Expected doesn't match actual: ", expectedResultAsString, actualResultAsString);
         logger.info("Success: the given expected value [{}], matches the actual value [{}] pointed by jsonPath '{}' ", expectedResultAsString, actualResultAsString, jsonPath);
     }
 
