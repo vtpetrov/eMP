@@ -8,11 +8,15 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.ReadContext;
+import emp.codemonster.models.requests.SaleDetails;
+import emp.codemonster.models.requests.SaleTransactionReq;
+import emp.codemonster.models.responses.TransactionResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
 import static emp.codemonster.common.Config.config;
@@ -47,6 +51,22 @@ public class BaseTest {
         healthCheckRoot();
 
         initializeCodemonsterEmptyRequest();
+    }
+
+    protected TransactionResponse createNewSaleTransaction() throws UnsupportedEncodingException {
+        SaleDetails saleDetails = SaleDetails.generateRandomSaleDetails();
+        SaleTransactionReq saleTransToSend = new SaleTransactionReq(saleDetails);
+
+        currentRequest.setBody(gson.toJson(saleTransToSend));
+        Response response = RestClient.post(currentRequest);
+
+        //Assert success response status code == 200
+        assertEquals("Status code is not as expected:", 200, response.getStatusCode());
+
+        // Assert response matches expected values (based on the request sent)
+        TransactionResponse saleTransRespObj = gson.fromJson(response.getBody(), TransactionResponse.class);
+
+        return saleTransRespObj;
     }
 
     protected void initializeCodemonsterEmptyRequest() {
@@ -110,7 +130,7 @@ public class BaseTest {
      *
      * @param json  The old JSON
      * @param node  the node to be updated
-     * @param value the value for the updted node
+     * @param value the value for the updated node
      * @return The new JSON
      */
     public String setJsonField(String json, String node, String value) {

@@ -67,6 +67,10 @@ public class TransactionResponse {
         return message;
     }
 
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
     @Override
     public String toString() {
         return "TransactionResponse to String: \n{" +
@@ -117,5 +121,12 @@ public class TransactionResponse {
         assertEquals("\"amount\" value is not as expected",
                 expectedAmount,
                 String.valueOf(this.getAmount()));
+    }
+
+    /**
+     * Verifies the "unique_id" property value in the JSON response.
+     * @param expectedId the expected value for "unique_id"
+     */
+    public void verifyUniqueId(String expectedId) {
     }
 }

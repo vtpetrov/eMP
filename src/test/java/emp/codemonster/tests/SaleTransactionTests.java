@@ -156,7 +156,7 @@ public class SaleTransactionTests extends BaseTest {
         currentRequest.deleteAuthorization();
         Response response = RestClient.post(currentRequest);
 
-        //Assert success response status code == 200 and response body:
+        //Assert success response status code == 401 and response body:
         assertEquals("Status code is not as expected:", 401, response.getStatusCode());
         assertEquals("Body not as expected", UNAUTHORIZED_401_RESPONSE_BODY, response.getBody());
 

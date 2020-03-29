@@ -49,18 +49,6 @@ public class SaleDetails {
         this.transactionType = "sale";
     }
 
-    /**
-     *
-     * @param transactionType
-     * @param cvv
-     * @param amount
-     * @param address
-     * @param usage
-     * @param cardHolder
-     * @param cardNumber
-     * @param email
-     * @param expirationDate
-     */
     public SaleDetails(String cardNumber, String cvv, String expirationDate, String amount, String usage, String transactionType, String cardHolder, String email, String address) {
         super();
         this.cardNumber = cardNumber;
@@ -77,12 +65,9 @@ public class SaleDetails {
     public static SaleDetails generateRandomSaleDetails(){
 
         SaleDetails details = new SaleDetails();
-
-//            faker.finance().creditCard();
         details.setCvv(RandomStringUtils.randomNumeric(3));
         details.setExpirationDate(Utils.getExpirationDate(faker.number().numberBetween(1,13), faker.number().numberBetween(2020,2025)));
         details.setAmount(String.valueOf(faker.number().numberBetween(100, 500)));
-//        details.setUsage(faker.lordOfTheRings().character());
         details.setUsage(faker.company().industry());
         details.setCardHolder(faker.name().fullName());
         details.setEmail(faker.internet().emailAddress());

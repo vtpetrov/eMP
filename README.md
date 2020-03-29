@@ -17,4 +17,19 @@ Following properties can be defined inside the config:
     execute this: `mvn clean test`
  
 - ### Selected tests:
-    TBA
+    If you want to run only the test methods of a given class <b>OR</b> a single test method,
+     specify the `class#method` name like:
+    <br>
+    - Run whole class, execute this: `mvn -Dtest=<className> clean test`  
+      where **\<className\>** provided like _VoidTransactionTests_**.java** OR _VoidTransactionTests_  
+    
+    - Run single method, execute this: `mvn -Dtest=<className>#<methodName> clean test`  
+     ApprovalSetupTest#approvalSetupAndExternalInvoiceAuthorizations
+     
+     (i) Find more details here http://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html
+
+# List of test classes/features:
+located in _src/test/java/emp/codemonster/tests/_
+1. SaleTransactionTests.java
+1. SaleTransactionNegativeTests
+1. VoidTransactionTests
