@@ -42,7 +42,7 @@ public class SaleTransactionNegativeTests extends BaseTest {
                 new Object[]{"card_number", faker.lorem().characters(16), "is invalid"},
                 new Object[]{"cvv", faker.number().digits(2), "is invalid"},
                 new Object[]{"cvv", faker.number().digits(5), "is invalid"},
-                new Object[]{"cvv", faker.lorem().characters(3), "is invalid"}
+                new Object[]{"cvv", faker.letterify("???"), "is invalid"}
         };
     }
 
@@ -65,7 +65,7 @@ public class SaleTransactionNegativeTests extends BaseTest {
         currentRequest.setBody(gson.toJson(saleTransToSend));
 
         Response response = RestClient.post(currentRequest);
-        assertEquals("Status code is not as expected:", 422, response.getStatusCode());
+        assertEquals(name.getMethodName() + " - Status code is not as expected:", 422, response.getStatusCode());
 
         UnprocessableEntityResponse responseObject = gson.fromJson(response.getBody(), UnprocessableEntityResponse.class);
 
