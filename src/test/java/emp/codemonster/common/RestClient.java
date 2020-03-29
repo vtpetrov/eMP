@@ -188,6 +188,10 @@ public class RestClient {
         RestAssured.baseURI = baseURI;
     }
 
+    public static String getBaseUrl(){
+        return RestAssured.baseURI;
+    }
+
     /**
      * Whether RestClient should automatically append the content charset to the content-type header if not defined explicitly
      *
