@@ -4,7 +4,7 @@ This is a simple API test framework aiming to test
 
 This is `Java 1.8` project built with `Maven`.
 
-#Config:
+# Config:
 Configuration is here "src/test/resources/Config.properties"
 Following properties can be defined inside the config:
 
@@ -12,7 +12,7 @@ Following properties can be defined inside the config:
 - **basicUser** - the "user" which will be used for generating the Basic Authorization
 - **basicPassword** - the "password" which will be used for generating the Basic Authorization
 
-#Run tests:
+# Run tests:
 - ###  All test:
     execute this: `mvn clean test`
  
@@ -24,7 +24,7 @@ Following properties can be defined inside the config:
       where **\<className\>** provided like _VoidTransactionTests_**.java** OR _VoidTransactionTests_  
     
     - Run single method, execute this: `mvn -Dtest=<className>#<methodName> clean test`  
-     ApprovalSetupTest#approvalSetupAndExternalInvoiceAuthorizations
+     where **\<className#methodName\>** provided like _VoidTransactionTests#voidExistingTransaction_
      
      (i) Find more details here http://maven.apache.org/surefire/maven-surefire-plugin/examples/single-test.html
 
